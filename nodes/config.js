@@ -1,6 +1,6 @@
 module.exports = {
   mode: 'development',
-  port: 3000,
+  port: 8080,
   app_id: 'kmasd2omd2moa',
   inited: true,
   db_url: 'mongodb+srv://inchi:x6SBUjXyYFOSJnc7@inchi-main-eoweo.mongodb.net/main?retryWrites=true',

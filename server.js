@@ -61,20 +61,20 @@ async function INIT () {
   console.log('id', id)
   // =========
   // HOT NODES
-  watcher.on('all', (event, filename, stats) => {
-    console.log('event: ', event)
-    console.log('filename: ', filename)
-    if (event === 'change') {
-      let _split = filename.split('/')
-      let _folder = _split[0]
-      let _name = _split[1].split('.')[0]
-      let p = currentPath + '/' + filename
-//       clearRequire(p)
-      console.log(event, ' filename: ', filename)
-//       if (_folder === 'nodes') nodes[_file] = require(currentPath + '/' + filename)
-//       if (_folder === 'flows') flows[_file] = require(currentPath + '/' + filename)
-    }
-  })
+//   watcher.on('all', (event, filename, stats) => {
+//     console.log('event: ', event)
+//     console.log('filename: ', filename)
+//     if (event === 'change') {
+//       let _split = filename.split('/')
+//       let _folder = _split[0]
+//       let _name = _split[1].split('.')[0]
+//       let p = currentPath + '/' + filename
+// //       clearRequire(p)
+//       console.log(event, ' filename: ', filename)
+// //       if (_folder === 'nodes') nodes[_file] = require(currentPath + '/' + filename)
+// //       if (_folder === 'flows') flows[_file] = require(currentPath + '/' + filename)
+//     }
+//   })
   // ===========
   // HTTP SERVER
   server.listen(port, '0.0.0.0', () => {
