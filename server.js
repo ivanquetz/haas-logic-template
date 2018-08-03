@@ -13,17 +13,18 @@ const chokidar = require('chokidar')
 const clearRequire = require('clear-require')
 const Ajv = require('ajv')
 
+var config = require('./nodes/config.js')
 var ajv = new Ajv({allErrors: true, format: 'full'})
 var currentPath = process.cwd()
-var config = require('./nodes/config.js')
 var port = process.env.PORT || config.port
+var models = require('require-all')({ dirname: __dirname + '/models' })
 var nodes = require('require-all')({ dirname: __dirname + '/nodes' })
-var flows = require('require-all')({ dirname: __dirname + '/flows' })
+// var flows = require('require-all')({ dirname: __dirname + '/flows' })
 var watcher = chokidar.watch(['./nodes', './flows'], {ignoreInitial: true, persistent: true})
 var db = null
 
 function getCtx () {
-  return {config: config, nodes: nodes, flows: flows}
+  return {config: config, modelsnodes: nodes, flows: flows}
 }
 // ==========
 // MIDDLEWARE
@@ -35,8 +36,8 @@ app.use(bodyParser.json())
 // SERVE CLIENT
 app.use(express.static('public'));
 app.get('/', function(request, response) {
-  response.sendFile(__dirname + '/views/index.html');
-});
+  response.sendFile(__dirname + '/client/index.html')
+})
 
 // ==============
 // SOCKET TRIGGER
@@ -57,24 +58,26 @@ app.post('/:route', (req, res) => {
 
 async function INIT () {
   console.log('INIT_start')
-  var id = await nodes['get_id'](getCtx(), {errors: []})
-  console.log('id', id)
-  // =========
-  // HOT NODES
-//   watcher.on('all', (event, filename, stats) => {
-//     console.log('event: ', event)
-//     console.log('filename: ', filename)
-//     if (event === 'change') {
-//       let _split = filename.split('/')
-//       let _folder = _split[0]
-//       let _name = _split[1].split('.')[0]
-//       let p = currentPath + '/' + filename
-// //       clearRequire(p)
-//       console.log(event, ' filename: ', filename)
-// //       if (_folder === 'nodes') nodes[_file] = require(currentPath + '/' + filename)
-// //       if (_folder === 'flows') flows[_file] = require(currentPath + '/' + filename)
-//     }
-//   })
+  // var id = await nodes['get_id'](getCtx(), {errors: []})
+  // console.log('id', id)
+
+  // ===========
+  // HOT MODULES
+  watcher.on('all', (event, filename, stats) => {
+    console.log('event: ', event)
+    console.log('filename: ', filename)
+    if (event === 'change') {
+      let _split = filename.split('/')
+      let _folder = _split[0]
+      let _name = _split[1].split('.')[0]
+      let p = currentPath + '/' + filename
+      clearRequire(p)
+      console.log(event, ' filename: ', filename)
+      // TODO: check by filename?
+      if (_folder === 'nodes') nodes[_file] = require(currentPath + '/' + filename)
+    }
+  })
+
   // ===========
   // HTTP SERVER
   server.listen(port, '0.0.0.0', () => {
